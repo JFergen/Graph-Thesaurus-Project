@@ -2,7 +2,6 @@
 #pragma ide diagnostic ignored "cert-msc30-c"
 #include <iostream>
 #include <string>
-#include <list>
 #include <cctype>
 #include <fstream>
 #include <sstream>
@@ -20,25 +19,26 @@ map<string, set<string>> totalGraph;
 
 int main()
 {
-    int nTimes = 0;
+    int nTimes = 0; // Number of words outputted (used only for 1st word of paragraph)
     string fileName;
-    ifstream fin; // Used to parse through file
+    ifstream fin; // Used to parse through files
     string firstWord; // This is the first word of every line (the main vertices)
-    string vertKey;
+    string vertKey; // Used for getting key of the map
     string otherWords; // Every word past the ':' (the synonyms)
-    set<string>::iterator removeThis;
+    set<string>::iterator removeThis; // Used to iterate through my set to remove the key from it
     int userChoice;
     string paragraphWords; // Used to read each word in paragraph
     int userRandTimes; // Number of times the user wants to hop randomly
-    char puncChar = 0; // Used to see if final character is punctuation character
+    char puncChar = 0; // Used to see if final character of string is punctuation character
     bool capLetter; // Used to see if the first letter is capital or not
-    bool hasPunc;
+    bool hasPunc; // If the last character is punc
     
-    srand(time(nullptr));
+    srand(time(nullptr)); // Seeds rand()
     rand();
     
-    cout << "Enter filename containing words and synonyms: ";  // Gets filename to open from user
+    cout << "Enter filename containing words and synonyms:";  // Gets filename to open from user
     cin >> fileName;
+    cout << endl;
     
     fin.open(fileName.c_str()); // Opens main file for input
     if(!fin.is_open())
@@ -57,6 +57,7 @@ int main()
         getline(fin, otherWords);
         istringstream commasGoAway(otherWords); // Used to get rid of commas
     
+        // Gets rid of commas and inserts all the words into a temp set;
         while(getline(commasGoAway, otherWords, ','))
         {
             bigSet.insert(otherWords);
@@ -106,22 +107,25 @@ int main()
     fin.close();
     
     // Getting user choice for what to do
-    cout << "1 for random synonym replacement. 2 for performing a paragraph similarity analysis." << endl;
+    cout << "1 for random synonym replacement. 2 for performing a paragraph similarity analysis:";
     cin >> userChoice;
     cin.ignore();
+    cout << endl;
     
-    while(userChoice != 2 && userChoice != 1) // Making sure user chooses 1 or 2
+    // Making sure user chooses 1 or 2
+    while(userChoice != 2 && userChoice != 1)
     {
         cout << "Invalid choice. Try again." << endl <<
-            "1 for random synonym replacement. 2 for performing a paragraph similarity analysis." << endl;
+            "1 for random synonym replacement. 2 for performing a paragraph similarity analysis:" << endl;
         cin >> userChoice;
     }
     
     switch(userChoice)
     {
         case 1: // Random synonym replacement
-            cout << "Enter filename containing paragraph for replacement: ";
+            cout << "Enter filename containing paragraph for replacement:";
             cin >> fileName;
+            cout << endl;
         
             fin.open(fileName.c_str()); // Opens main file for input
             if(!fin.is_open())

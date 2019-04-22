@@ -148,6 +148,13 @@ int main()
                     puncChar = paragraphWords.back(); // Gets last character of each string (to check for punctuation)
                     paragraphWords.pop_back();
                 }
+    
+                // If the first character is a capital letter
+                if(isupper(paragraphWords.front()))
+                {
+                    capLetter = true;
+                    paragraphWords[0] = tolower(paragraphWords[0]);
+                }
                 
                 if(totalGraph.find(paragraphWords) == totalGraph.end()) // If I am not changing the word, then just print it out
                 {// Not found in map
@@ -155,6 +162,11 @@ int main()
                     if(hasPunc)
                     {
                         paragraphWords += puncChar;
+                    }
+    
+                    if(capLetter)
+                    {
+                        paragraphWords[0] = toupper(paragraphWords[0]);
                     }
                     
                     if(nTimes == 0) // If it is the first word of the paragraph;
@@ -168,18 +180,12 @@ int main()
                 }
                 else // If it is in the map
                 {
-                    // If the first character is a capital letter
-                    if(isupper(paragraphWords.front()))
-                    {
-                        capLetter = true;
-                    }
-    
                     paragraphWords = getSynonym(paragraphWords, userRandTimes); // Gets the synonym according to # of hops
     
                     // Change the first letter of synonym to capital if need be
                     if(capLetter)
                     {
-                        toupper(paragraphWords[0]);
+                        paragraphWords[0] = toupper(paragraphWords[0]);
                     }
                     
                     if(hasPunc)

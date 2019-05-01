@@ -22,9 +22,12 @@ int main()
     int nTimes = 0; // Number of words outputted (used only for 1st word of paragraph)
     string fileName;
     ifstream fin; // Used to parse through files
+    ifstream fin2;
     string firstWord; // This is the first word of every line (the main vertices)
     string vertKey; // Used for getting key of the map
     string otherWords; // Every word past the ':' (the synonyms)
+    string paragraph1Words; // Used to read through paragraph1
+    string paragraph2Words; // Used to read through paragraph2
     set<string>::iterator removeThis; // Used to iterate through my set to remove the key from it
     int userChoice;
     string paragraphWords; // Used to read each word in paragraph
@@ -134,7 +137,14 @@ int main()
                 return EXIT_FAILURE;
             }
             
-            userRandTimes = 1; //TODO Make random # of changes based on user's input (must be >= 1) (1 for milestone)
+            cout << "Enter the number of times the words should be swapped (>= 1):";
+            cin >> userRandTimes;
+            
+            while(userRandTimes < 1)
+            {
+                cout << "Error. Please enter a number that is >= 1:";
+                cin >> userRandTimes;
+            }
         
             while(getline(fin, paragraphWords, ' '))
             {
@@ -206,9 +216,80 @@ int main()
                     }
                 }
             }
+            fin.close();
             break;
         case 2: // Paragraph similarity analysis//TODO
-            cout << "Not yet implemented" << endl;
+            cout << "Enter filename containing first paragraph for analysis:";
+            cin >> fileName;
+            cout << endl;
+        
+            fin.open(fileName.c_str()); // Opens main file for input
+            if(!fin.is_open())
+            {
+                cout << fileName <<  " could not be found";
+                return EXIT_FAILURE;
+            }
+        
+            cout << "Enter filename containing second paragraph for analysis:";
+            cin >> fileName;
+            cout << endl;
+        
+            fin2.open(fileName.c_str()); // Opens main file for input
+            if(!fin2.is_open())
+            {
+                cout << fileName <<  " could not be found";
+                return EXIT_FAILURE;
+            }
+            
+            while(getline(fin, paragraph1Words, ' '))
+            {
+                getline(fin2, paragraph2Words, ' ');
+                
+                if(paragraph1Words != paragraph2Words)
+                {
+                    // If the last character is punctuation
+                    if(ispunct(paragraph1Words.back()))
+                    {
+                        paragraph1Words.pop_back();
+                        paragraph2Words.pop_back();
+                    }
+    
+                    // If the first character is a capital letter
+                    if(isupper(paragraph1Words.front()))
+                    {
+                        paragraph1Words[0] = tolower(paragraph1Words[0]);
+                        paragraph2Words[0] = tolower(paragraph2Words[0]);
+                    }
+                    
+                    if(totalGraph.find(paragraph1Words) == totalGraph.end() || totalGraph.find(paragraph2Words) == totalGraph.end())
+                    {
+                        cout << "Paragraphs are not similar." << endl;
+                        fin.close();
+                        fin2.close();
+                        return 0;
+                    }
+                    
+                    for(auto it = totalGraph.at(paragraph1Words).begin(); it != totalGraph.at(paragraph1Words).end(); it++)
+                    {
+                        if(*it == paragraph2Words)
+                        {
+                            break;
+                        }
+                        
+                        if(it == totalGraph.at(paragraph1Words).end())
+                        {
+                            cout << "Paragraphs are not similar." << endl;
+                            fin.close();
+                            fin2.close();
+                            return 0;
+                        }
+                    }
+                }
+            }
+            
+            cout << "Paragraphs are similar." << endl;
+            fin.close();
+            fin2.close();
             break;
         default:
             cout << "Please don't go here somehow";
@@ -222,22 +303,29 @@ string getSynonym(string key, int randTimes)
 {
     int randWordNum = 0;
     int i = 1;
+    string prevWord;
     
     do
     {
         randWordNum = rand() % totalGraph[key].size(); //
         
-        if(i == randTimes)
-        {
-            auto it = totalGraph[key].begin();
-            advance(it, randWordNum);
-            return *it;
-        }
-        
         auto itr = totalGraph[key].begin();
         advance(itr, randWordNum);
-        key = *itr;
         i++;
+        
+        if(*itr == prevWord)
+        {
+            randWordNum = rand() % totalGraph[key].size();
+            advance(itr, randWordNum);
+        }
+        
+        if(i == randTimes)
+        {
+            return *itr;
+        }
+        
+        key = *itr;
+        prevWord = *itr;
     }while(i != randTimes);
 }
 

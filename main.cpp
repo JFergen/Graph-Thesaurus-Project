@@ -14,6 +14,8 @@
 using namespace std;
 
 string getSynonym(string key, int rand);
+int DFSUtil(const string& node, const string& end, set<string>& visited);
+int DFS(string start, string end);
 
 map<string, set<string>> totalGraph;
 
@@ -218,7 +220,7 @@ int main()
             }
             fin.close();
             break;
-        case 2: // Paragraph similarity analysis//TODO
+        case 2: // Paragraph similarity analysis
             cout << "Enter filename containing first paragraph for analysis:";
             cin >> fileName;
             cout << endl;
@@ -260,7 +262,8 @@ int main()
                         paragraph1Words[0] = tolower(paragraph1Words[0]);
                         paragraph2Words[0] = tolower(paragraph2Words[0]);
                     }
-                    
+    
+                    // If one word is not in the map
                     if(totalGraph.find(paragraph1Words) == totalGraph.end() || totalGraph.find(paragraph2Words) == totalGraph.end())
                     {
                         cout << "Paragraphs are not similar." << endl;
@@ -269,20 +272,13 @@ int main()
                         return 0;
                     }
                     
-                    for(auto it = totalGraph.at(paragraph1Words).begin(); it != totalGraph.at(paragraph1Words).end(); it++)
-                    {
-                        if(*it == paragraph2Words)
-                        {
-                            break;
-                        }
-                        
-                        if(it == totalGraph.at(paragraph1Words).end())
-                        {
-                            cout << "Paragraphs are not similar." << endl;
-                            fin.close();
-                            fin2.close();
-                            return 0;
-                        }
+                    // DFS to find if the words are connected
+                    if(DFS(paragraph1Words, paragraph2Words) == 2)
+                    { // Not connected
+                        cout << "Paragraphs are not similar." << endl;
+                        fin.close();
+                        fin2.close();
+                        return 0;
                     }
                 }
             }
@@ -327,6 +323,39 @@ string getSynonym(string key, int randTimes)
         key = *itr;
         prevWord = *itr;
     }while(i != randTimes);
+}
+
+//Basis is from Geeks4Geeks
+int DFSUtil(const string& node, const string& end, set<string>& visited)
+{
+    // Mark the current node as visited
+    visited.insert(node);
+    
+    if(node == end)
+    {
+        return 1;
+    }
+    
+    // Recur for all the vertices adjacent to this vertex
+    for(auto it = totalGraph.at(node).begin(); it != totalGraph.at(node).end(); it++)
+    {
+        if(visited.find(*it) == visited.end())
+        {
+            DFSUtil(*it, end, visited);
+        }
+    }
+    return 2;
+}
+
+// Basis is from Geeks4Geeks
+// The function to do DFS traversal. It uses recursive DFSUtil()
+int DFS(string start, string end)
+{
+    set<string> visitedSet; // Holds the strings of where it has visited
+    
+    // Call the recursive helper function to print DFS traversal
+    // starting from all vertices one by one
+    DFSUtil(start, end, visitedSet);
 }
 
 #pragma clang diagnostic pop

@@ -13,11 +13,13 @@
 #include <ctime>
 using namespace std;
 
-string getSynonym(string key, int rand);
+string getSynonym(string key, int rand); // Gets the synonyn of a word based on # of hops
+
+// These are used in conjunction for DFS searching algorithm
 int DFSUtil(const string& node, const string& end, set<string>& visited);
 int DFS(string start, string end);
 
-map<string, set<string>> totalGraph;
+map<string, set<string>> totalGraph; // BIG GRAPH BOI
 
 int main()
 {
@@ -55,8 +57,8 @@ int main()
     // Reads through all the starting data and puts it into the graph
     while(getline(fin, firstWord, ':'))
     {
-        set<string> bigSet;
-        set<string> smallSet;
+        set<string> bigSet; // Beginning set
+        set<string> smallSet; // This set is unioned with bigSet
         bigSet.insert(firstWord);
     
         getline(fin, otherWords);
